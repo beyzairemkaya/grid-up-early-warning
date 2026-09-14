@@ -1,0 +1,22 @@
+{
+    "current_l1_a": 318.0,
+    "current_l2_a": 315.0,
+    "current_l3_a": 322.0,
+
+    "cabinet_temperature_c": 29.1,
+    "surface_temperature_l1_c": 50.3,
+    "surface_temperature_l2_c": 49.7,
+    "surface_temperature_l3_c": 51.0,
+
+    "relative_humidity_pct": 50.9,
+
+    "pd_index": 5.2,
+    "pd_pulse_count": 3,
+
+    "overload_risk": 10,
+    "connection_risk": 8,
+    "insulation_risk": 5,
+
+    "arc_status": 0,
+    "general_status": 0
+}
