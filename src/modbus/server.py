@@ -1,33 +1,81 @@
+import argparse
+
 from pymodbus.server import StartTcpServer
 from pymodbus.simulator import DataType, SimData, SimDevice
+from register_mapper import encode_snapshot
 
 
-REGISTER_VALUES = [
-    3180,  # Offset 0 / 40001: L1 akımı = 318.0 A
-    291,   # Offset 1 / 40002: Kabin sıcaklığı = 29.1 °C
-    503,   # Offset 2 / 40003: Yüzey sıcaklığı = 50.3 °C
-    509,   # Offset 3 / 40004: Bağıl nem = %50.9
-    35,    # Offset 4 / 40005: Aşırı yük risk skoru
-    62,    # Offset 5 / 40006: Bağlantı risk skoru
-    20,    # Offset 6 / 40007: İzolasyon risk skoru
-    0,     # Offset 7 / 40008: Ark durumu
-    1,     # Offset 8 / 40009: Genel durum
-]
+SCENARIOS = {
+    "normal": {
+        "current_l1_a": 318.0,
+        "cabinet_temperature_c": 29.1,
+        "surface_temperature_c": 50.3,
+        "relative_humidity_pct": 50.9,
+        "overload_risk": 10,
+        "connection_risk": 8,
+        "insulation_risk": 5,
+        "arc_status": 0,
+        "general_status": 0,
+    },
+
+    "arc": {
+        "current_l1_a": 318.0,
+        "cabinet_temperature_c": 29.1,
+        "surface_temperature_c": 50.3,
+        "relative_humidity_pct": 50.9,
+        "overload_risk": 10,
+        "connection_risk": 8,
+        "insulation_risk": 5,
+        "arc_status": 1,
+        "general_status": 3,
+    },
+}
 
 
-device = SimDevice(
-    id=1,
-    simdata=[
-        SimData(
-            address=0,
-            values=REGISTER_VALUES,
-            datatype=DataType.REGISTERS,
-            readonly=True,
-        )
-    ],
-)
+def create_device(register_values):
+    return SimDevice(
+        id=1,
+        simdata=[
+            SimData(
+                address=0,
+                values=register_values,
+                datatype=DataType.REGISTERS,
+                readonly=True,
+            )
+        ],
+    )
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Grid Up Modbus TCP field module simulator"
+    )
+
+    parser.add_argument(
+        "--scenario",
+        choices=SCENARIOS.keys(),
+        default="normal",
+        help="Test scenario presented through Modbus",
+    )
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+
+    snapshot = SCENARIOS[args.scenario]
+    register_values = encode_snapshot(snapshot)
+    device = create_device(register_values)
+
+    print(f"Active scenario: {args.scenario}")
+    print("Modbus TCP server running at 127.0.0.1:5020")
+
+    StartTcpServer(
+        device,
+        address=("127.0.0.1", 5020),
+    )
 
 
 if __name__ == "__main__":
-    print("Modbus TCP server running at 127.0.0.1:5020", flush=True)
-    StartTcpServer(device, address=("127.0.0.1", 5020))
+    main()
