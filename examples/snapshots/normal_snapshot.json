@@ -1,0 +1,11 @@
+{
+    "current_l1_a": 318.0,
+    "cabinet_temperature_c": 29.1,
+    "surface_temperature_c": 60.3,
+    "relative_humidity_pct": 50.9,
+    "overload_risk": 10,
+    "connection_risk": 8,
+    "insulation_risk": 5,
+    "arc_status": 0,
+    "general_status": 0
+}
