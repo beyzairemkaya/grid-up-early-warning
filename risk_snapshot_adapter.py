@@ -9,7 +9,7 @@ from __future__ import annotations
 from anomali_motoru_v2 import Okuma, Sonuc
 
 
-def risk_scores(result: Sonuc) -> dict[str, int]:
+def risk_scores(result: Sonuc, reading: Okuma | None = None) -> dict[str, int]:
     """Transparent 0..100 rule scores, not calibrated failure probabilities."""
     alarms = set(result.alarmlar)
 
@@ -21,6 +21,14 @@ def risk_scores(result: Sonuc) -> dict[str, int]:
     connection_risk = 0
     if contact:
         connection_risk = 85 if "SICAKLIK_UYARI" in alarms else 70
+    # The engine skips its contact suspicion check when a temperature is
+    # critical. Preserve the cause in Modbus when the critical hot spot is
+    # localized to exactly one phase, rather than reporting all scores as 0.
+    if reading is not None and "SICAKLIK_KRITIK" in alarms:
+        temps = sorted((reading.sicaklik_r, reading.sicaklik_s, reading.sicaklik_t))
+        delta = temps[2] - (temps[0] + temps[1]) / 2
+        if delta > 10.0 and abs(temps[1] - temps[0]) <= 4.0:
+            connection_risk = 95
 
     insulation_risk = 0
     if "NEM_YOGUSMA" in alarms:
@@ -72,7 +80,7 @@ def make_snapshot(
     if pd_critical_pc <= 0:
         raise ValueError("pd_critical_pc must be positive")
 
-    scores = risk_scores(result)
+    scores = risk_scores(result, reading)
     arc = int(result.sistem_kilitli or bool({"ARK_FLASI", "SISTEM_KILITLI"} & set(result.alarmlar)))
     return {
         "current_l1_a": reading.i_r,
