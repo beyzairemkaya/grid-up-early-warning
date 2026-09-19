@@ -68,6 +68,16 @@ class RiskIntegrationTest(unittest.TestCase):
         self.assertEqual(arc_snapshot["arc_status"], 1)
         self.assertEqual(arc_snapshot["general_status"], 3)
 
+    def test_critical_local_hotspot_keeps_connection_as_dominant_risk(self):
+        hot_l3 = Okuma(**{**vars(self.reading), "sicaklik_t": 157.9})
+        snapshot = self.snapshot(hot_l3)
+        self.assertEqual(snapshot["general_status"], 3)
+        self.assertEqual(snapshot["connection_risk"], 95)
+        sender = Sender()
+        manager = AlarmManager(sender, recipient="FIELD_TEAM")
+        self.assertTrue(manager.process(snapshot))
+        self.assertIn("Connection (95/100)", sender.messages[-1])
+
     def test_overload_score_and_no_pulse_fabrication(self):
         result = Sonuc(zaman=None, bitmap=0, seviye="UYARI",
                        alarmlar=["FAZ_DENGESIZLIGI", "ASIRI_YUK"])
