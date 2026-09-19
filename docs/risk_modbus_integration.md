@@ -11,8 +11,7 @@ Mevcut Modbus register adresleri ve SCADA client değiştirilmez.
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-python sentetik_veri.py
-python run_risk_snapshot.py --csv sentetik_veri_problem_bazli.csv --snapshot-file runtime/risk_snapshot.json --pd-pulse-count 3 --cabinet-temperature-c 29.1
+python run_risk_snapshot.py --csv examples/risk_demo.csv --snapshot-file runtime/risk_snapshot.json --interval 15
 ```
 
 Son üç komutu ayrı terminallerde, önce snapshot dosyası oluştuktan sonra çalıştırın:
@@ -27,6 +26,17 @@ python -m src.notifications.notification_service
 **simüle edilen sabit örnekler** sağlar. CSV'ye `pd_pulse_count` ve
 `cabinet_temperature_c` sütunları eklenirse her satır için gerçek senaryo
 değerleri kullanılır. Eksik değerler otomatik olarak sıfırla doldurulmaz.
+
+Kısa demo CSV ilk üç satırda normal kalır (diğer terminalleri başlatma süresi),
+ardından bağlantı riski 85, normale dönüş, kritik PD ve ark senaryolarını
+gösterir. Her satır 15 saniye kalır; son ark snapshot'ı motorda kilitlenir.
+
+Uzun sentetik veri oynatımı için ayrıca şu komutları kullanabilirsiniz:
+
+```powershell
+python sentetik_veri.py
+python run_risk_snapshot.py --csv sentetik_veri_problem_bazli.csv --snapshot-file runtime/risk_snapshot.json --pd-pulse-count 3 --cabinet-temperature-c 29.1
+```
 
 ## Prototip puan politikası
 
