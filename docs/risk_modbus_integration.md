@@ -43,7 +43,7 @@ python run_risk_snapshot.py --csv sentetik_veri_problem_bazli.csv --snapshot-fil
 | Skor | Motorun alarmı | Puan |
 | --- | --- | ---: |
 | Aşırı yük | Faz dengesizliği / aşırı yük / ikisi | 40 / 75 / 90 |
-| Bağlantı | Lokal termal sapma / ek olarak sıcaklık uyarısı | 70 / 85 |
+| Bağlantı | Lokal termal sapma / ek olarak sıcaklık uyarısı / kritik tek faz sıcaklığı ve diğer iki faz tutarlı | 70 / 85 / 95 |
 | İzolasyon | Yüksek nem / PD trendi / PD uyarısı / PD kritik | 20 / 40 / 65 / 90 |
 
 Bir grupta birden fazla bulgu varsa en yüksek kural uygulanır. Skorlar
