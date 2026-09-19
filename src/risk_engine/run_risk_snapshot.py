@@ -12,8 +12,8 @@ import tempfile
 import time
 from pathlib import Path
 
-from anomali_motoru_v2 import AnomaliMotoru, Okuma
-from risk_snapshot_adapter import make_snapshot
+from src.risk_engine.anomali_motoru_v2 import AnomaliMotoru, Okuma
+from src.risk_engine.risk_snapshot_adapter import make_snapshot
 
 try:
     from src.modbus.register_mapper import encode_snapshot

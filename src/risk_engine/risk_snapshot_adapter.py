@@ -6,7 +6,7 @@ register mapper and Modbus server do not need to be changed.
 
 from __future__ import annotations
 
-from anomali_motoru_v2 import Okuma, Sonuc
+from src.risk_engine.anomali_motoru_v2 import Okuma, Sonuc
 
 
 def risk_scores(result: Sonuc, reading: Okuma | None = None) -> dict[str, int]:

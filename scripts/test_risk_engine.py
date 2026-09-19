@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
- TEST_ET.PY  -  Anomali motorunu KENDI VERINLE calistir
+ TEST_RISK_ENGINE.PY  -  Anomali motorunu KENDI VERINLE calistir
 =============================================================================
 Kullanim (terminalde):
 
-    python test_et.py veri.csv
-    python test_et.py veri.csv --nominal 320
-    python test_et.py veri.csv --cikti sonuc.csv
-    python test_et.py --sablon           # bos sablon CSV uretir
+    python -m scripts.test_risk_engine veri.csv
+    python -m scripts.test_risk_engine veri.csv --nominal 320
+    python -m scripts.test_risk_engine veri.csv --cikti sonuc.csv
+    python -m scripts.test_risk_engine --sablon   # bos sablon CSV uretir
 
 Bu script jurinin/baska bir ekibin kendi CSV dosyasini getirip, sutun
 isimleri birebir ayni olmasa bile (yaygin varyasyonlari taniyor) motoru
@@ -25,17 +25,12 @@ from pathlib import Path
 
 import pandas as pd
 
-try:
-    from anomali_motoru_v2 import calistir, dogrula_ve_excele_yaz as dogrula, Esikler, SUTUN_HARITASI
-except ModuleNotFoundError:
-    print(
-        "HATA: 'anomali_motoru_v2.py' bulunamadi.\n"
-        "Bu script tek basina calismaz - 'anomali_motoru_v2.py' dosyasinin\n"
-        "TAM OLARAK AYNI KLASORDE olmasi gerekiyor.\n\n"
-        "Kontrol et:\n"
-        "  ls  (bu klasorde 'anomali_motoru_v2.py' gorunmeli)\n"
-    )
-    raise SystemExit(1)
+from src.risk_engine.anomali_motoru_v2 import (
+    Esikler,
+    SUTUN_HARITASI,
+    calistir,
+    dogrula_ve_excele_yaz as dogrula,
+)
 
 
 # =============================================================================
@@ -124,7 +119,7 @@ def sablon_uret(yol: str = "veri_sablonu.csv", n: int = 5) -> None:
         "ambient_humidity_RH": [55.0, 56.2, 54.8, 57.0, 55.5],
         "pd_charge_pC": [3.2, 2.8, 3.5, 4.1, 3.0],
         "optical_lux": [22.0, 25.1, 20.8, 24.0, 21.5],
-        "ground_truth": ["NORMAL", "NORMAL", "NORMAL", "ASIRI_YUK", "NORMAL"],
+        "ground_truth": ["NORMAL", "NORMAL", "NORMAL", "GEVSEK_BAGLANTI", "NORMAL"],
     })
     ornek.to_csv(yol, index=False)
     print(f"Sablon uretildi -> {yol}")
@@ -169,7 +164,7 @@ def calistir_ve_raporla(csv_yolu: str, nominal_akim: float | None,
             print(f"  - {e}   (beklenen isimler: {e}, {', '.join(olasi)})")
         print("\nCozum: sutun basliklarini yukaridaki isimlerden birine "
               "cevir, ya da --sablon ile ornek formati incele:\n"
-              "  python test_et.py --sablon")
+              "  python -m scripts.test_risk_engine --sablon")
         return 1
 
     print("Sutun eslesmesi basarili:")
@@ -209,7 +204,7 @@ def calistir_ve_raporla(csv_yolu: str, nominal_akim: float | None,
     print("\nEn sik 10 alarm turu:")
     print(rapor["tespit_alarmlar"].value_counts().head(10).to_string())
     print(f"\nOrtalama saglik skoru : {rapor['saglik_skoru'].mean():.1f} / 100")
-    print(f"Kesici acma komutu    : {int(rapor['kesici_ac'].sum())} kez")
+    print(f"Kesici acma karari (simulasyon): {int(rapor['kesici_ac'].sum())} kez")
     print(f"En dusuk saglik skoru : {rapor['saglik_skoru'].min():.1f}  "
           f"({rapor.loc[rapor['saglik_skoru'].idxmin(), 'tespit_alarmlar']})")
 
@@ -254,7 +249,7 @@ def main() -> int:
 
     if not args.csv:
         ap.print_help()
-        print("\nOrnek kullanim:\n  python test_et.py grid_verisi.csv --nominal 320")
+        print("\nOrnek kullanim:\n  python -m scripts.test_risk_engine grid_verisi.csv --nominal 320")
         return 1
 
     return calistir_ve_raporla(args.csv, args.nominal, args.cikti, args.termal_kapat)

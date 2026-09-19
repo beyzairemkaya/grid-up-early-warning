@@ -4,9 +4,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from anomali_motoru_v2 import AnomaliMotoru, Okuma, Sonuc
-from risk_snapshot_adapter import make_snapshot, risk_scores
-from run_risk_snapshot import write_snapshot
+from src.risk_engine.anomali_motoru_v2 import AnomaliMotoru, Okuma, Sonuc
+from src.risk_engine.risk_snapshot_adapter import make_snapshot, risk_scores
+from src.risk_engine.run_risk_snapshot import write_snapshot
 from src.modbus.register_mapper import encode_snapshot
 from src.modbus.scada_client import decode_registers
 from src.notifications.alarm_manager import AlarmManager
